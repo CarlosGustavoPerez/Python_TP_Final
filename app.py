@@ -1,6 +1,7 @@
 from analizadores.analizador_dataset import AnalizadorDataset
 from servicios.servicio_insights import ServicioInsights
 from servicios.servicio_llm import ServicioLLM
+from servicios.servicio_pdf import ServicioPDF
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -34,6 +35,10 @@ st.sidebar.markdown(
     - Insights automáticos
     """
 )
+
+# Inicialización del historial
+if "historial_chat" not in st.session_state:
+    st.session_state.historial_chat = []
 
 archivo = st.file_uploader(
     "Seleccione un archivo CSV",
@@ -204,25 +209,40 @@ if archivo is not None:
                 informe = servicio_llm.generar_informe(
                     contexto
                 )
-
+                st.session_state["informe_ia"] = informe
                 st.markdown(
                     informe,
                     unsafe_allow_html=True
                 )
+                if "informe_ia" in st.session_state:
+                    pdf = ServicioPDF.generar_pdf(
+                        resumen_ejecutivo,
+                        insights,
+                        st.session_state["informe_ia"]
+                    )
+                    st.download_button(
+                        label="📄 Descargar Informe PDF",
+                        data=pdf,
+                        file_name="informe_datapilot.pdf",
+                        mime="application/pdf"
+                    )
         
         st.header("💬 Consultar Dataset")
         pregunta = st.text_input(
             "Realice una pregunta sobre el dataset"
         )
-        if st.button("Consultar"):
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            consultar = st.button("Consultar")
+        with col2:
+            limpiar = st.button("Limpiar conversación")
+        if limpiar:
+            st.session_state.historial_chat = []
+        if consultar:
             if not pregunta.strip():
-                st.warning(
-                    "Ingrese una pregunta."
-                )
+                st.warning("Ingrese una pregunta.")
             else:
-                with st.spinner(
-                    "Consultando IA..."
-                ):
+                with st.spinner("Consultando IA..."):
                     servicio_llm = ServicioLLM()
                     contexto = (
                         analizador.obtener_contexto_llm()
@@ -233,9 +253,28 @@ if archivo is not None:
                             pregunta
                         )
                     )
-
-                    st.markdown(respuesta)
-                    
+                    st.session_state.historial_chat.append(
+                        {
+                            "pregunta": pregunta,
+                            "respuesta": respuesta
+                        }
+                    )
+        if len(st.session_state.historial_chat) > 0:
+            st.subheader(
+                "Historial de Conversación"
+            )
+            for item in reversed(
+                st.session_state.historial_chat
+            ):
+                st.markdown(
+                    f"**🧑 Usuario:** {item['pregunta']}"
+                )
+                st.markdown(
+                    f"**🤖 IA:** {item['respuesta']}",
+                    unsafe_allow_html=True
+                )
+                st.divider()
+                
     except Exception as error:
         st.error(
             f"Error al procesar el archivo: {error}"
