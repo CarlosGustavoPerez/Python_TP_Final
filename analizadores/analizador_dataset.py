@@ -106,6 +106,7 @@ class AnalizadorDataset:
         calidad = self.analizar_calidad_datos()
         outliers = self.detectar_outliers()
         correlaciones = self.obtener_correlaciones()
+        muestra = self.df.head(10)
         return f"""
         FILAS:
         {resumen['filas']}
@@ -123,4 +124,45 @@ class AnalizadorDataset:
         {outliers.to_string()}
         CORRELACIONES:
         {correlaciones.to_string()}
+        MUESTRA DE DATOS:
+        {muestra.to_string(index=False)}
         """
+    
+    def limpiar_dataset(self):
+        df_limpio = self.df.copy()
+        filas_originales = len(df_limpio)
+        duplicados = df_limpio.duplicated().sum()
+        df_limpio = df_limpio.drop_duplicates()
+        nulos_antes = self.df.isnull().sum().sum()
+        
+        for columna in df_limpio.columns:
+            if df_limpio[columna].dtype in [
+                "int64",
+                "float64"
+            ]:
+                mediana = df_limpio[columna].median()
+                df_limpio[columna] = (
+                    df_limpio[columna]
+                    .fillna(mediana)
+                )
+            else:
+                if not df_limpio[columna].mode().empty:
+                    moda = (
+                        df_limpio[columna]
+                        .mode()[0]
+                    )
+                    df_limpio[columna] = (
+                        df_limpio[columna]
+                        .fillna(moda)
+                    )
+        nulos_despues = (df_limpio.isnull().sum().sum())
+        filas_finales = len(df_limpio)
+        
+        return {
+            "dataset": df_limpio,
+            "duplicados_eliminados": int(duplicados),
+            "filas_originales": filas_originales,
+            "filas_finales": filas_finales,
+            "nulos_antes": int(nulos_antes),
+            "nulos_despues": int(nulos_despues)
+        }

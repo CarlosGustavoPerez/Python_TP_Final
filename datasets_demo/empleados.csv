@@ -1,0 +1,12 @@
+id,nombre,edad,departamento,salario,antiguedad
+1,Ana,25,IT,1500,2
+2,Juan,30,Ventas,1700,4
+3,Carlos,45,RRHH,2200,10
+4,Lucia,38,IT,2100,8
+5,Pedro,29,Ventas,1600,3
+6,Sofia,41,Finanzas,2400,12
+7,Martin,35,IT,2000,6
+8,Laura,27,RRHH,1550,2
+9,Marcos,50,Finanzas,2900,20
+10,Julieta,31,Ventas,1750,5
+``

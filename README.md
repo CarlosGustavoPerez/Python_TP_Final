@@ -198,6 +198,32 @@ Exportación PDF
 
 ---
 
+## Aplicación desplegada
+
+https://iatpfinal.streamlit.app/
+
+---
+
+## Casos de Prueba Incluidos
+
+El repositorio incluye datasets de demostración para validar distintas funcionalidades de la aplicación:
+
+- ventas_problematicas.csv
+  - Valores nulos
+  - Registros duplicados
+  - Outliers
+  - Correlaciones fuertes
+
+- autos.csv
+  - Correlaciones débiles
+  - Variables numéricas y categóricas
+
+- empleados.csv
+  - Dataset de Recursos Humanos
+  - Consultas mediante IA
+
+---
+
 ## Autor
 
 Carlos Gustavo Pérez

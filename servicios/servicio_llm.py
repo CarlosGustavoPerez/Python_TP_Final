@@ -54,22 +54,21 @@ class ServicioLLM:
 
         return self._consultar_modelo(prompt)
 
-    def responder_pregunta(self, contexto, pregunta):
-
+    def responder_pregunta(self,contexto,historial,pregunta):
+        historial_texto = ""
+        for item in historial[-5:]:
+            historial_texto += f"""
+            Usuario: {item['pregunta']}
+            IA: {item['respuesta']}
+            """
         prompt = f"""
-        Actúa como un analista de datos.
-
-        Utiliza únicamente la información proporcionada.
-
+        Actúa como analista de datos.
         Contexto:
-
         {contexto}
-
+        Historial:
+        {historial_texto}
         Pregunta:
-
         {pregunta}
-
         Responde en español.
         """
-
         return self._consultar_modelo(prompt)
