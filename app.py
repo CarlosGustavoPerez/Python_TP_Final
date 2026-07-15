@@ -275,6 +275,18 @@ if archivo is not None:
 
         with tab7:
             st.header("🧹 Limpieza Automática")
+            recomendaciones = (
+                ServicioLimpieza
+                .generar_recomendaciones(
+                    calidad,
+                    outliers,
+                    metricas["duplicados"]
+                )
+            )
+
+            st.subheader(" 🧹 Recomendaciones de Limpieza")
+            for recomendacion in recomendaciones:
+                st.warning(recomendacion)
             if st.button("Limpiar Dataset"):
                 resultado_limpieza = (analizador.limpiar_dataset())
                 dataset_limpio = (resultado_limpieza["dataset"])
@@ -302,25 +314,15 @@ if archivo is not None:
                     "text/csv"
                 )    
 
-        st.header("🤖 Análisis Inteligente")
-        st.subheader("🧹 Recomendaciones de Limpieza")
-        recomendaciones = (
-            ServicioLimpieza
-            .generar_recomendaciones(
-                calidad,
-                outliers,
-                metricas["duplicados"]
-            )
-        )
-
-        with st.container():
-            st.markdown("""## 🧹 Recomendaciones de Limpieza""")
-            for recomendacion in recomendaciones:
-                st.warning(recomendacion)
+        st.header("🤖 Insights Automáticos")
+        
         insights = ServicioInsights.generar_insights(
             resumen_ejecutivo,
             calidad,
             outliers
+        )
+        st.success(
+            f"Se generaron {len(insights)} insights automáticos."
         )
         for insight in insights:
             st.info(insight)
