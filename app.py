@@ -398,10 +398,15 @@ if archivo is not None:
         st.caption(
             """
             DataPilot AI
+            
             Trabajo Práctico Final
+            
             Programación en Python - UAI
+            
             Tecnologías:
+            
             Pandas • Streamlit • Hugging Face • Plotly
+            
             """
         )
         
