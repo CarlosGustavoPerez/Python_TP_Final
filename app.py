@@ -6,6 +6,7 @@ from servicios.servicio_insights import ServicioInsights
 from servicios.servicio_llm import ServicioLLM
 from servicios.servicio_pdf import ServicioPDF
 from servicios.servicio_limpieza import ServicioLimpieza
+from utilidades.validadores import archivo_csv_valido
 
 st.set_page_config(
     page_title="DataPilot AI",
@@ -86,6 +87,14 @@ archivo = st.file_uploader(
 
 if archivo is not None:
     try:
+        if not archivo_csv_valido(
+            archivo.name
+        ):
+            st.error(
+                "Debe seleccionar un archivo CSV válido."
+            )
+            st.stop()
+        
         df = pd.read_csv(archivo)
 
         analizador = AnalizadorDataset(df)
@@ -155,14 +164,12 @@ if archivo is not None:
 
         with tab1:
             st.header("Gráficos")
-            columnas_numericas = (analizador.obtener_columnas_numericas())
+            columnas_numericas = sorted(analizador.obtener_columnas_numericas(), key=lambda columna: columna.lower())
             if columnas_numericas:
                 columna = st.selectbox("Seleccione una columna numérica",columnas_numericas)
                 figura = px.histogram(df,x=columna,title=f"Distribución de {columna}")
                 st.plotly_chart(figura,width="stretch")
-            columnas_categoricas = (
-                analizador.obtener_columnas_categoricas()
-            )
+            columnas_categoricas = sorted(analizador.obtener_columnas_categoricas(), key=lambda columna: columna.lower())
 
             if columnas_categoricas:
                 st.subheader("Distribución de Variables Categóricas")

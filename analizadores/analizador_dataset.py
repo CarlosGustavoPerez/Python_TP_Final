@@ -106,7 +106,18 @@ class AnalizadorDataset:
         calidad = self.analizar_calidad_datos()
         outliers = self.detectar_outliers()
         correlaciones = self.obtener_correlaciones()
-        muestra = self.df.head(10)
+        primeras_filas = []
+        for indice, fila in enumerate(
+            self.iterar_filas()
+        ):
+            if indice >= 10:
+                break
+            primeras_filas.append(
+                str(fila.to_dict())
+            )
+        muestra = "\n".join(
+            primeras_filas
+        )
         return f"""
         FILAS:
         {resumen['filas']}
@@ -125,7 +136,7 @@ class AnalizadorDataset:
         CORRELACIONES:
         {correlaciones.to_string()}
         MUESTRA DE DATOS:
-        {muestra.to_string(index=False)}
+        {muestra}
         """
     
     def limpiar_dataset(self):
@@ -166,3 +177,12 @@ class AnalizadorDataset:
             "nulos_antes": int(nulos_antes),
             "nulos_despues": int(nulos_despues)
         }
+    def obtener_columnas_ordenadas(self):
+        return sorted(
+            self.df.columns,
+            key=lambda columna: columna.lower()
+        )
+    
+    def iterar_filas(self):
+        for _, fila in self.df.iterrows():
+            yield fila
