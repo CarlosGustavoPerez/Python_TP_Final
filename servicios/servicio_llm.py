@@ -19,7 +19,7 @@ class ServicioLLM:
                     "content": prompt
                 }
             ],
-            max_tokens=500
+            max_tokens=1000
         )
 
         return respuesta.choices[0].message.content
